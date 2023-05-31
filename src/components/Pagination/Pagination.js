@@ -1,30 +1,110 @@
 import React, { useEffect, useState } from "react"
 const Pagination = (props)=>{
-    const [active,setActive] = useState()
-    useEffect(()=>{
-        //setTotalPage(props?.pagesize?.pages)
-    },[])
-    const paginationClick = (e)=>{
-        setActive(e.target.value)
-        props.searchnews(e.target.value)
+    const [currentPage, setCurrentPage] = useState(1);
+    const paginationClick = (page)=>{
+        props.searchnews(page);
+        setCurrentPage(page);
+
     }
-    const pagenumbers = ()=>{
-       return  Array.apply(null, Array(Math.ceil(props?.pagesize?.pages/1000))).map(function(x, i) {
-        if(i>=7 && i <= props?.pagesize?.pages/1000 - 7){
-            if(i==8) {
-                return "..."
+        const paginatorButton = [];
+        if (props?.pagesize?.pages <= 10) {
+            for (let i = 1; i <= props?.pagesize?.pages; i++) {
+              paginatorButton.push(
+                <button
+                  key={i}
+                  onClick={() => paginationClick(i)}
+                  disabled={currentPage === i}
+                >
+                  {i}
+                </button>
+              );
             }
-        }
-        else{
-            return <li value={i+1} onClick={paginationClick} className={i+1 == active ?"active-btn":""}>{i+1}</li>
-        }    
-        })
-    }
-    return(
+          } else {
+            if (currentPage <= 4) {
+              for (let i = 1; i <= 5; i++) {
+                paginatorButton.push(
+                  <button
+                    key={i}
+                    onClick={() => paginationClick(i)}
+                    disabled={currentPage === i}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+              paginatorButton.push(<span key="dots">...</span>);
+              paginatorButton.push(
+                <button
+                  key={props?.pagesize?.pages}
+                  onClick={() => paginationClick(props?.pagesize?.pages)}
+                  disabled={currentPage === props?.pagesize?.pages}
+                >
+                  {props?.pagesize?.pages}
+                </button>
+              );
+            } else if (currentPage > props?.pagesize?.pages - 4) {
+              paginatorButton.push(
+                <button
+                  key={1}
+                  onClick={() => paginationClick(1)}
+                  disabled={currentPage === 1}
+                >
+                  1
+                </button>
+              );
+              paginatorButton.push(<span key="dots">...</span>);
+              // Render last 5 pages without dots
+              for (let i = props?.pagesize?.pages - 4; i <= props?.pagesize?.pages; i++) {
+                paginatorButton.push(
+                  <button
+                    key={i}
+                    onClick={() => paginationClick(i)}
+                    disabled={currentPage === i}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+            } else {
+              paginatorButton.push(
+                <button
+                  key={1}
+                  onClick={() => paginationClick(1)}
+                  disabled={currentPage === 1}
+                >
+                  1
+                </button>
+              );
+              paginatorButton.push(<span key="dots">...</span>);
+              // Render current page and the two pages before and after
+              for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                paginatorButton.push(
+                  <button
+                    key={i}
+                    onClick={() => paginationClick(i)}
+                    disabled={currentPage === i}
+                  >
+                    {i}
+                  </button>
+                );
+              }
+              paginatorButton.push(<span key="dots">...</span>);
+              paginatorButton.push(
+                <button
+                  key={props?.pagesize?.pages}
+                  onClick={() => paginationClick(props?.pagesize?.pages)}
+                  disabled={currentPage === props?.pagesize?.pages}
+                >
+                  {props?.pagesize?.pages}
+                </button>
+              );
+            }
+          }
+        return(
         <>
-            <ul>
-                {props?.pagesize?.pages && pagenumbers()}
-            </ul>
+            <div>
+                {paginatorButton}
+            </div>
         </>
     )
 }

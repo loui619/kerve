@@ -7,6 +7,10 @@ const News = (props)=>{
         //const d = new Date(date);
         return date;
     }
+    const searchWithKeywords = (event)=>{
+        event.stopPropagation()
+        props.searchNews(event.target.value);
+    }
     const createNewsFeeds = ()=>{
         return newsFeeds?.results?.map((items)=>{
             return(
@@ -22,8 +26,10 @@ const News = (props)=>{
                             <p>
                             {items?.webTitle}
                             </p>
+                            
                        </div>
                         </a>
+                        <button onClick={searchWithKeywords} value={items?.webTitle}>{items?.webTitle}</button>
                     </div>
                 </div>
             )

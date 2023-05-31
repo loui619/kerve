@@ -6,8 +6,6 @@ import Pagination from "../Pagination/Pagination";
 const Home = ()=>{
     const [newsContent,setNewsContent] = useState();
     const [searchKey,setSearchKey] = useState();
-    const [pageNo,setPageNo] = useState(0);
-    const [searchEnable,setSerchEnable] = useState(false);
     const searchWord = (e)=>{
         setSearchKey(e.target.value)
     }
@@ -16,41 +14,34 @@ const Home = ()=>{
             setNewsContent(data?.response);
         })
     },[])
-    useEffect(()=>{
-        API.getItembyKey(searchKey,pageNo).then((data)=>{
+    const searchNews = (pageNo=1)=>{
+        API.getItembyWord(searchKey,pageNo).then((data)=>{
             setNewsContent(data?.response);
         })
-        
-    },[searchEnable])
-    const searchNews = (page)=>{
-        setSerchEnable(!searchEnable)
-        if(typeof page === 'object'){
-            if(pageNo==0){
-                setPageNo(1)
-            }
-            else{
-                setPageNo(pageNo)
-            }
+    }
+    const searchWithKey = (keyword,pageNo=1)=>{
+        API.getItemByKey(searchKey,pageNo,keyword).then((data)=>{
+            setNewsContent(data?.response);
+        })
+    }
+    const handleEnterKeyPress =(e)=>{
+        if (e.key === 'Enter') {
+            searchNews(searchKey);
         }
-        else{
-            setPageNo(page);
-        }
-        
-     }
+    }
     return(
         <>
             <div className="home-container">
                 <div className="search-container">
-                    
-                    <input className="input-text" type="text" value={searchKey} onChange={searchWord}/>
+                    <input className="input-text" type="text" value={searchKey} onChange={searchWord} onKeyDown={handleEnterKeyPress}/>
                     <button className="search-btn" onClick={()=>searchNews()}>Search</button>
                 </div>
                 <div className="news-container">
-                    <News newsfeeds={newsContent}/>
+                    <News newsfeeds={newsContent} searchNews={searchWithKey}/>
                 </div>
                 <footer>
                     <div className="pagination-container">
-                        <Pagination pagesize={newsContent} searchnews={searchNews}/>
+                       {newsContent && <Pagination pagesize={newsContent} searchnews={searchNews}/>}
                     </div>
                 </footer>
             </div>
